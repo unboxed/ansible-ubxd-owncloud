@@ -21,6 +21,11 @@
     - exim4
     - php5-imagick
     - php-apc
+    - php5-fpm
+    - php5-mysql
+
+- include: configure_nginx.yml
+  tags: configure_nginx
 
 - name: Install ownCloud
   apt: name=owncloud state=present force=yes

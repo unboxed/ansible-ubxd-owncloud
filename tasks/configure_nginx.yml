@@ -1,0 +1,31 @@
+---
+
+- name: Unboxed OwnCloud | Nginx Config
+  tags:
+    - owncloud_server_nginx
+  handlers:
+    - name: restart nginx
+      action: service name=nginx state=restarted enabled=yes
+  tasks:
+    - name: Install package {{ item }}
+      apt: name={{ item }}
+      with_items:
+        - nginx
+    - name: Remove default nginx site
+      file: path=/etc/nginx/sites-enabled/default state=absent
+      tags: nginx
+      notify:
+        - restart nginx
+    - name: Add nginx server configs
+      template: src=group_files/owncloud/etc/nginx/sites-available/owncloud.j2 dest=/etc/nginx/sites-available/{{ inventory_hostname }} owner=root group=root mode=0440
+      tags: nginx
+      notify:
+        - restart nginx
+    - name: Add nginx server symlinks
+      file: src=/etc/nginx/sites-available/{{ item }} dest=/etc/nginx/sites-enabled/{{ item }} state=link
+      with_items:
+        - "{{ inventory_hostname }}"
+      tags: nginx
+      notify:
+        - restart nginx
+        
