@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Kips Davenport
+  description: Ansible role that downloads and installs and configures ownCloud
+  license: GPLv3
+  min_ansible_version: 1.9
+  platforms:
+    - name: Ubuntu
+      versions:
+      - trusty
+  categories:
+    - web
+    - cloud
+dependencies: []
