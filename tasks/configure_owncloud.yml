@@ -40,8 +40,8 @@
   template:
     src: var/www/owncloud/config/autoconfig.php.j2
     dest: '{{ owncloud_deploy_path }}/config/autoconfig.php'
-    owner: '{{ owncloud_user }}'
-    group: '{{ owncloud_group }}'
+    owner: www-data
+    group: www-data
     mode: 0660
   when: owncloud_config_file is defined #and not owncloud_config_file.stat.exists
 
@@ -49,8 +49,8 @@
   template:
     src: var/www/owncloud/config/config.default.php.j2
     dest: '{{ owncloud_deploy_path }}/config/config.php'
-    owner: '{{ owncloud_user }}'
-    group: '{{ owncloud_group }}'
+    owner: www-data
+    group: www-data
     mode: 0640
   when: owncloud_config_file is defined #and not owncloud_config_file.stat.exists
 

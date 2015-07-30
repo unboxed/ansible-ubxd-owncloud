@@ -17,7 +17,7 @@
       notify:
         - restart nginx
     - name: Add nginx server configs
-      template: src=group_files/owncloud/etc/nginx/sites-available/owncloud.j2 dest=/etc/nginx/sites-available/{{ inventory_hostname }} owner=root group=root mode=0440
+      template: src=etc/nginx/sites-available/owncloud.j2 dest=/etc/nginx/sites-available/{{ inventory_hostname }} owner=root group=root mode=0440
       tags: nginx
       notify:
         - restart nginx
@@ -28,4 +28,3 @@
       tags: nginx
       notify:
         - restart nginx
-        
