@@ -1,0 +1,45 @@
+---
+
+- name: Install package {{ item }}
+  apt: name={{ item }}
+  with_items:
+    - php-xml-parser
+    - php5-intl
+    - php5-mcrypt
+    - php5-imagick
+    - php-apc
+    - php5-apcu
+    - php5-fpm
+    - php5-mysql    
+
+- name: Uncomment php-fpm configuration lines
+  lineinfile:
+    dest: /etc/php5/fpm/pool.d/www.conf
+    insertafter: "{{ item.insertafter }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { insertafter: '^;env[HOSTNAME]', line: 'env[HOSTNAME] = $HOSTNAME' }
+    - { insertafter: '^;env[PATH]', line: 'env[PATH] = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin' }
+    - { insertafter: '^;env[TMP]', line: 'env[TMP] = /tmp' }
+    - { insertafter: '^;env[TMPDIR]', line: 'env[TMPDIR] = /tmp' }
+    - { insertafter: '^;env[TEMP]', line: 'env[TEMP] = /tmp' }
+  notify:
+  - restart php5-fpm
+
+  # Taken from https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-debian-7
+- name: Add php-fpm configuration lines
+  lineinfile:
+    dest: /etc/php5/fpm/php.ini
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: '^post_max_size =', line: 'post_max_size = {{ owncloud_upload_size }}' }
+    - { regexp: '^output_buffering =', line: 'output_buffering = {{ owncloud_php5_output_buffering }}' }
+    - { regexp: '^upload_max_filesize =', line: 'upload_max_filesize = {{ owncloud_upload_size }}' }
+  notify:
+  - restart php5-fpm
+
+- name: Unboxed OwnCloud | Core Setup | Reconfigure php5-fpm pathinfo
+  lineinfile: dest=/etc/php5/fpm/php.ini insertafter="^;cgi.fix_pathinfo=.*" line="cgi.fix_pathinfo=0"
+  notify:
+    - restart php5-fpm

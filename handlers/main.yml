@@ -1,0 +1,8 @@
+---
+
+- name: restart nginx
+  action: service name=nginx state=restarted enabled=yes
+
+- name: restart php5-fpm
+  action: service name=php5-fpm state=restarted enabled=yes
+  ignore_errors: yes

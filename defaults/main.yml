@@ -1,15 +1,15 @@
 ---
 
 # --- Basic options ---
-
+# set to True when a previous database exists
+previous_database: False
 # Domain that will be configured for ownCloud instance
 owncloud_domain: [ 'owncloud.{{ ansible_domain }}' ]
 
 # User and group that will be used for ownCloud instance
-owncloud_user: 'www-data'
-owncloud_group: 'www-data'
+owncloud_user: 'owncloud'
+owncloud_group: 'owncloud'
 owncloud_home: '/var/www/owncloud'
-
 
 # Path where ownCloud data/ directory and files are stored
 owncloud_data_path: '/data/{{ owncloud_domain[0] }}/'

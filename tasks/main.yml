@@ -11,24 +11,22 @@
   apt_key: url='http://download.opensuse.org/repositories/isv:ownCloud:community/xUbuntu_{{ ansible_distribution_version }}/Release.key' state=present
   when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= 12
 
-- name: Install dependencies
-  apt: pkg={{ item }} state=present
-  with_items:
-    - php-xml-parser
-    - php5-intl
-    - php5-mcrypt
-    - curl
-    - exim4
-    - php5-imagick
-    - php-apc
-    - php5-fpm
-    - php5-mysql
+- include: install_packages.yml
+  handlers:
+    - include: 'handlers/main.yml'
+  tags: install_owncloud_packages
+
+- include: configure_php.yml
+  handlers:
+    - include: 'handlers/main.yml'
+  tags: configure_owncloud_php   
 
 - include: configure_nginx.yml
-  tags: configure_nginx
+  handlers:
+    - include: 'handlers/main.yml'
+  tags: configure_owncloud_nginx
 
 - name: Install ownCloud
   apt: name=owncloud state=present force=yes
-
+  tags: install_owncloud
 - include: configure_owncloud.yml
-  tags: owncloud
