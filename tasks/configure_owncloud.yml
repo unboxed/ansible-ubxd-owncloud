@@ -56,10 +56,10 @@
 
 - name: Use cron for background jobs (settings/admin.php)
   lineinfile:
-     dest: '{{ owncloud_deploy_path }}/settings/admin.php'
-     state: present
-     regexp: "'backgroundjobs_mode', OC_Appconfig::getValue"
-     line: "$tmpl->assign('backgroundjobs_mode', OC_Appconfig::getValue('core', 'backgroundjobs_mode', 'cron'));"
+    dest: '{{ owncloud_deploy_path }}/settings/admin.php'
+    state: present
+    regexp: "'backgroundjobs_mode', OC_Appconfig::getValue"
+    line: "$tmpl->assign('backgroundjobs_mode', OC_Appconfig::getValue('core', 'backgroundjobs_mode', 'cron'));"
   when: not owncloud_config_file
 
 - name: Flush handlers if automatic setup is requested
@@ -67,8 +67,24 @@
   when: owncloud_config_file is defined and not owncloud_config_file.stat.exists and
         owncloud_admin_username and owncloud_autosetup
 
+- name: Data Directory
+  tags: owncloud_data_dir
+  file: path={{ item }} state=directory owner=www-data group=www-data mode=0770
+  with_items:
+    - /data/
+    - /data/{{ inventory_hostname }}/
+    - /data/{{ inventory_hostname }}/.ocdata/
+
+- name: Automatically finish setup if allowed
+  tags: owncloud_auto_finish
+  uri:
+    url: 'https://{{ owncloud_domain[0] }}/index.php'
+  when: owncloud_config_file is defined
+        and owncloud_admin_username
+        and owncloud_autosetup
+
 - name: Set previous installed
-  tags: previous_database
+  tags: owncloud_previous_database
   lineinfile:
     dest: '{{ owncloud_deploy_path }}/config/config.php'
     state: present
@@ -76,9 +92,13 @@
     line: "  'installed' => true,"
   when: previous_database
 
-- name: Automatically finish setup if allowed
-  tags: auto_finish
-  uri:
-    url: 'https://{{ owncloud_domain[0] }}/index.php'
-  when: owncloud_config_file is defined and not owncloud_config_file.stat.exists and
-        owncloud_admin_username and owncloud_autosetup and not previous_database
+- name: Set occ as executable
+  tags: owncloud_occ_permissions
+  file: path={{ owncloud_deploy_path }}/occ owner=www-data group=www-data mode="u+x"
+  when: owncloud_upgrade
+
+- name: Upgrade if available
+  tags: owncloud_upgrade
+  sudo_user: www-data
+  command: '{{ owncloud_deploy_path }}/occ upgrade'
+  when: owncloud_upgrade

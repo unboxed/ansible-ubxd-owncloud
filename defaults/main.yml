@@ -3,6 +3,9 @@
 # --- Basic options ---
 # set to True when a previous database exists
 previous_database: False
+# set to trye to auto upgrade owncloud
+owncloud_upgrade: False
+
 # Domain that will be configured for ownCloud instance
 owncloud_domain: [ 'owncloud.{{ ansible_domain }}' ]
 
@@ -51,7 +54,7 @@ owncloud_password_length: '20'
 # if the config-files are generated in the same run.
 # Important: For this to work, name resolution has to be set up
 #        when this role is executed.
-owncloud_autosetup: True
+owncloud_autosetup: False
 
 # --- ownCloud configuration ---
 
